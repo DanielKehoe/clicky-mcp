@@ -20,6 +20,9 @@ import { getBounceRateTool, handleGetBounceRate } from './tools/get-bounce-rate.
 import { getCountriesTool, handleGetCountries } from './tools/get-countries.js';
 import { getSearchesTool, handleGetSearches } from './tools/get-searches.js';
 import { getReferringDomainsTool, handleGetReferringDomains } from './tools/get-referring-domains.js';
+import { getDownloadsTool, handleGetDownloads } from './tools/get-downloads.js';
+import { getEntrancesTool, handleGetEntrances } from './tools/get-entrances.js';
+import { getOutboundLinksTool, handleGetOutboundLinks } from './tools/get-outbound-links.js';
 
 function getCredentials() {
   // Only load .env if credentials aren't already in the environment.
@@ -110,6 +113,9 @@ class ClickyMCPServer {
         getCountriesTool,
         getSearchesTool,
         getReferringDomainsTool,
+        getDownloadsTool,
+        getEntrancesTool,
+        getOutboundLinksTool,
       ],
     }));
 
@@ -150,6 +156,15 @@ class ClickyMCPServer {
 
           case 'get_referring_domains':
             return await handleGetReferringDomains(args as any, this.clickyClient);
+
+          case 'get_downloads':
+            return await handleGetDownloads(args as any, this.clickyClient);
+
+          case 'get_entrances':
+            return await handleGetEntrances(args as any, this.clickyClient);
+
+          case 'get_outbound_links':
+            return await handleGetOutboundLinks(args as any, this.clickyClient);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

@@ -172,4 +172,41 @@ export class ClickyClient {
     const response = await this.client.get('', { params });
     return response.data;
   }
+
+  async getDownloads(date: string, limit?: number): Promise<unknown> {
+    const params: Record<string, unknown> = {
+      ...this.baseParams(),
+      type: 'downloads',
+      date,
+    };
+    const lim = this.clampLimit(limit);
+    if (lim) params.limit = lim;
+    const response = await this.client.get('', { params });
+    return response.data;
+  }
+
+  async getEntrances(date: string, limit?: number, url?: string): Promise<unknown> {
+    const params: Record<string, unknown> = {
+      ...this.baseParams(),
+      type: 'pages-entrance',
+      date,
+    };
+    const lim = this.clampLimit(limit);
+    if (lim) params.limit = lim;
+    if (url) params.filter = this.extractPath(url);
+    const response = await this.client.get('', { params });
+    return response.data;
+  }
+
+  async getOutboundLinks(date: string, limit?: number): Promise<unknown> {
+    const params: Record<string, unknown> = {
+      ...this.baseParams(),
+      type: 'links-outbound',
+      date,
+    };
+    const lim = this.clampLimit(limit);
+    if (lim) params.limit = lim;
+    const response = await this.client.get('', { params });
+    return response.data;
+  }
 }

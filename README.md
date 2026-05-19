@@ -1,6 +1,6 @@
 # Clicky MCP Server
 
-A Model Context Protocol (MCP) server that exposes [Clicky](https://clicky.com) web analytics as 11 tools for AI assistants — visitor counts, top pages, traffic sources, bounce rate, search terms, real-time visitors, and more. See the [Tool reference](#tool-reference) for the full list.
+A Model Context Protocol (MCP) server that exposes [Clicky](https://clicky.com) web analytics as 14 tools for AI assistants — visitor counts, top pages, traffic sources, bounce rate, search terms, real-time visitors, and more. See the [Tool reference](#tool-reference) for the full list.
 
 ---
 
@@ -42,7 +42,7 @@ Then pick your MCP host below.
    ```
    Get `ABSOLUTE_PATH_TO_NODE` by running `which node` in your terminal. **Don't just put `"node"`** — Claude Desktop launches via `launchd` with a minimal PATH that doesn't include nvm or homebrew, so a bare `"node"` will fail silently. Same goes for the path to `dist/index.js`: it must be absolute.
 3. Fully quit Claude Desktop (`⌘Q` on macOS — closing the window isn't enough), then reopen it.
-4. Verify by asking Claude *"list my Clicky MCP tools"* — you should see 11 tools.
+4. Verify by asking Claude *"list my Clicky MCP tools"* — you should see 14 tools.
 
 If something goes wrong, see [Troubleshooting](#troubleshooting).
 
@@ -57,7 +57,7 @@ claude mcp add clicky-analytics \
   -- node /absolute/path/to/clicky-mcp/dist/index.js
 ```
 
-This writes to `~/.claude.json` by default. Add `--scope project` to write a project-local `.mcp.json` instead. Restart Claude Code (or run `/mcp` to refresh) and the 11 tools become available.
+This writes to `~/.claude.json` by default. Add `--scope project` to write a project-local `.mcp.json` instead. Restart Claude Code (or run `/mcp` to refresh) and the 14 tools become available.
 
 ### MCP Inspector (debugging)
 
@@ -88,7 +88,7 @@ Example:
 
 ## Tool reference
 
-All 11 tools, alphabetical-ish by use case.
+All 14 tools, alphabetical-ish by use case.
 
 ### get_total_visitors
 Total visitor counts for a period.
@@ -140,6 +140,22 @@ Top search terms that brought visitors.
 
 ### get_countries
 Visitor breakdown by country.
+- `start_date` / `end_date` **or** `date_range`
+- `limit` (number, optional, max 1000)
+
+### get_downloads
+File download counts per URL — DMG, PDF, ZIP, and other downloadable files.
+- `start_date` / `end_date` **or** `date_range`
+- `limit` (number, optional, max 1000)
+
+### get_entrances
+Top landing pages (entrances) — first page of a visitor session, distinct from total views.
+- `start_date` / `end_date` **or** `date_range`
+- `limit` (number, optional, max 1000)
+- `url` (string, optional) — filter to a specific landing page
+
+### get_outbound_links
+Outbound click counts per external URL — affiliate links, partner click-throughs.
 - `start_date` / `end_date` **or** `date_range`
 - `limit` (number, optional, max 1000)
 
@@ -217,7 +233,7 @@ If you'd like an AI agent (e.g. Claude Code in another project) to install this 
 2. Ask the user for their Clicky Site ID and Site Key (https://clicky.com/user/preferences/site).
 3. Run `which node` and capture the absolute path.
 4. Locate the user's Claude Desktop config (paths in [Quick start › Claude Desktop](#claude-desktop)) and merge in the `mcpServers` snippet from that section, substituting the absolute `node` path, the absolute `dist/index.js` path, and the user's credentials.
-5. Tell the user to fully restart Claude Desktop (`⌘Q`), then verify by asking Claude *"list my Clicky MCP tools"* — 11 tools should appear.
+5. Tell the user to fully restart Claude Desktop (`⌘Q`), then verify by asking Claude *"list my Clicky MCP tools"* — 14 tools should appear.
 
 For Claude Code, the single `claude mcp add` command in [Quick start › Claude Code](#claude-code) is faster and writes the config in one step.
 
