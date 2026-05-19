@@ -146,6 +146,12 @@ describe('ClickyClient', () => {
         method: 'getReferringDomains',
         expectedType: 'referrers-domains',
       },
+      { name: 'downloads', method: 'getDownloads', expectedType: 'downloads' },
+      {
+        name: 'outbound links',
+        method: 'getOutboundLinks',
+        expectedType: 'links-outbound',
+      },
     ];
 
     for (const c of cases) {
@@ -158,5 +164,40 @@ describe('ClickyClient', () => {
         assert.equal(stub.calls[0].params.date, 'last-7-days');
       });
     }
+  });
+
+  describe('getEntrances', () => {
+    it('sends type=pages-entrance and clamps limit', async () => {
+      const { client, stub } = newClient();
+      await client.getEntrances('last-7-days', 5000);
+      assert.equal(stub.calls[0].params.type, 'pages-entrance');
+      assert.equal(stub.calls[0].params.limit, 1000);
+      assert.equal(stub.calls[0].params.date, 'last-7-days');
+      assert.equal('filter' in stub.calls[0].params, false);
+    });
+
+    it('omits limit param when not provided', async () => {
+      const { client, stub } = newClient();
+      await client.getEntrances('last-7-days');
+      assert.equal('limit' in stub.calls[0].params, false);
+    });
+
+    it('extracts the path when given a full URL', async () => {
+      const { client, stub } = newClient();
+      await client.getEntrances('last-7-days', undefined, 'https://example.com/blog/post?x=1');
+      assert.equal(stub.calls[0].params.filter, '/blog/post');
+    });
+
+    it('prefixes a leading slash when given a bare path fragment', async () => {
+      const { client, stub } = newClient();
+      await client.getEntrances('last-7-days', undefined, 'foo');
+      assert.equal(stub.calls[0].params.filter, '/foo');
+    });
+
+    it('passes through an already-rooted path', async () => {
+      const { client, stub } = newClient();
+      await client.getEntrances('last-7-days', undefined, '/about');
+      assert.equal(stub.calls[0].params.filter, '/about');
+    });
   });
 });
