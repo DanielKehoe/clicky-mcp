@@ -71,6 +71,31 @@ Then open the printed URL, set `CLICKY_SITE_ID` and `CLICKY_SITE_KEY` as environ
 
 ---
 
+## Multi-site setup
+
+A single server instance can serve **multiple Clicky sites**. Configure them with the `CLICKY_SITES` env var — a JSON map of alias → `{ site_id, site_key }`:
+
+```json
+"env": {
+  "CLICKY_SITES": "{\"install.guide\":{\"site_id\":\"101430979\",\"site_key\":\"...\"},\"astrologyprompt.com\":{\"site_id\":\"101505474\",\"site_key\":\"...\"}}",
+  "CLICKY_DEFAULT_SITE": "install.guide"
+}
+```
+
+Then every analytics tool accepts an optional `site` parameter to choose which site to query:
+
+```json
+{ "date_range": "last-7-days", "site": "astrologyprompt.com" }
+```
+
+Omit `site` to use the default. Use the **`list_sites`** tool to discover what's configured.
+
+Default resolution (highest priority first): `CLICKY_DEFAULT_SITE` env var → an alias literally named `default` → the first alias in the map.
+
+The legacy `CLICKY_SITE_ID` / `CLICKY_SITE_KEY` env vars still work and register a single site under the alias `default` — existing single-site setups need no change.
+
+---
+
 ## Date parameters
 
 Every date-aware tool accepts **either** an explicit date range **or** a Clicky relative-date keyword — but not both:
@@ -187,7 +212,7 @@ For working *on* the server, not just using it.
 npm install         # install deps
 npm run dev         # run with tsx, watching for changes (used for local testing only)
 npm run build       # compile TS to dist/
-npm test            # 46 unit tests, offline, no credentials needed
+npm test            # 66 unit tests, offline, no credentials needed
 npm run test:integration  # live API smoke test (requires .env or env vars)
 ```
 
@@ -209,6 +234,7 @@ clicky-mcp/
 ├── src/
 │   ├── index.ts              # MCP server + tool dispatcher
 │   ├── clicky-client.ts      # Clicky HTTP API client
+│   ├── site-registry.ts      # Multi-site config loader + router
 │   ├── date-utils.ts         # Shared date param builder
 │   └── tools/                # One file per tool
 ├── test/                     # node:test unit tests
