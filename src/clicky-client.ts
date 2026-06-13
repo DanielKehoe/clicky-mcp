@@ -1,5 +1,20 @@
 import axios, { AxiosInstance } from 'axios';
 
+export const SEGMENTATION_FILTER_KEYS = [
+  'href',
+  'goal',
+  'landing',
+  'link',
+  'domain',
+  'search',
+  'uid',
+  'ip_address',
+  'custom',
+  'campaign',
+] as const;
+
+export type SegmentationFilterKey = (typeof SEGMENTATION_FILTER_KEYS)[number];
+
 export interface ClickyConfig {
   siteId: string;
   siteKey: string;
@@ -164,7 +179,7 @@ export class ClickyClient {
   async getReferringDomains(date: string, limit?: number): Promise<unknown> {
     const params: Record<string, unknown> = {
       ...this.baseParams(),
-      type: 'referrers-domains',
+      type: 'links-domains',
       date,
     };
     const lim = this.clampLimit(limit);
@@ -206,6 +221,65 @@ export class ClickyClient {
     };
     const lim = this.clampLimit(limit);
     if (lim) params.limit = lim;
+    const response = await this.client.get('', { params });
+    return response.data;
+  }
+
+  async getSegmentation({
+    filterKey,
+    filterValue,
+    segments,
+    date,
+    limit,
+  }: {
+    filterKey: string;
+    filterValue: string;
+    segments: string[];
+    date: string;
+    limit?: number;
+  }): Promise<unknown> {
+    if (!SEGMENTATION_FILTER_KEYS.includes(filterKey as SegmentationFilterKey)) {
+      throw new Error(
+        `Invalid filter_key "${filterKey}". Valid keys: ${SEGMENTATION_FILTER_KEYS.join(', ')}`
+      );
+    }
+    const params: Record<string, unknown> = {
+      ...this.baseParams(),
+      type: 'segmentation',
+      [filterKey]: filterValue,
+      segments: segments.join(','),
+      date,
+    };
+    const lim = this.clampLimit(limit);
+    if (lim) params.limit = lim;
+    const response = await this.client.get('', { params });
+    return response.data;
+  }
+
+  async getActionsList({
+    filterKey,
+    filterValue,
+    date,
+    limit,
+    page,
+  }: {
+    filterKey?: string;
+    filterValue?: string;
+    date: string;
+    limit?: number;
+    page?: number;
+  }): Promise<unknown> {
+    const params: Record<string, unknown> = {
+      ...this.baseParams(),
+      type: 'actions-list',
+      date,
+    };
+    if (filterKey && filterValue) {
+      params[filterKey] = filterValue;
+    }
+    const lim = this.clampLimit(limit);
+    if (lim) params.limit = lim;
+    if (page !== undefined && page > 1) params.page = page;
     const response = await this.client.get('', { params });
     return response.data;
   }

@@ -144,7 +144,7 @@ describe('ClickyClient', () => {
       {
         name: 'referring domains',
         method: 'getReferringDomains',
-        expectedType: 'referrers-domains',
+        expectedType: 'links-domains',
       },
       { name: 'downloads', method: 'getDownloads', expectedType: 'downloads' },
       {
@@ -164,6 +164,110 @@ describe('ClickyClient', () => {
         assert.equal(stub.calls[0].params.date, 'last-7-days');
       });
     }
+  });
+
+  describe('getSegmentation', () => {
+    it('throws for an invalid filter_key', async () => {
+      const { client } = newClient();
+      await assert.rejects(
+        () =>
+          client.getSegmentation({
+            filterKey: 'invalid-key',
+            filterValue: 'x',
+            segments: ['pages'],
+            date: 'last-7-days',
+          }),
+        /Invalid filter_key "invalid-key"/
+      );
+    });
+
+    it('sends type=segmentation with the filter key as a param name', async () => {
+      const { client, stub } = newClient();
+      await client.getSegmentation({
+        filterKey: 'href',
+        filterValue: 'https://warp.dev',
+        segments: ['pages'],
+        date: 'last-7-days',
+      });
+      assert.equal(stub.calls[0].params.type, 'segmentation');
+      assert.equal(stub.calls[0].params.href, 'https://warp.dev');
+      assert.equal(stub.calls[0].params.segments, 'pages');
+      assert.equal('invalid-key' in stub.calls[0].params, false);
+    });
+
+    it('joins multiple segments with a comma', async () => {
+      const { client, stub } = newClient();
+      await client.getSegmentation({
+        filterKey: 'goal',
+        filterValue: 'my-goal',
+        segments: ['visitors', 'pages'],
+        date: 'last-7-days',
+      });
+      assert.equal(stub.calls[0].params.segments, 'visitors,pages');
+      assert.equal(stub.calls[0].params.goal, 'my-goal');
+    });
+
+    it('clamps limit > 1000 down to 1000', async () => {
+      const { client, stub } = newClient();
+      await client.getSegmentation({
+        filterKey: 'href',
+        filterValue: 'x',
+        segments: ['pages'],
+        date: 'last-7-days',
+        limit: 5000,
+      });
+      assert.equal(stub.calls[0].params.limit, 1000);
+    });
+
+    it('omits limit param when not provided', async () => {
+      const { client, stub } = newClient();
+      await client.getSegmentation({
+        filterKey: 'href',
+        filterValue: 'x',
+        segments: ['pages'],
+        date: 'last-7-days',
+      });
+      assert.equal('limit' in stub.calls[0].params, false);
+    });
+  });
+
+  describe('getActionsList', () => {
+    it('sends type=actions-list with date, no filter or page by default', async () => {
+      const { client, stub } = newClient();
+      await client.getActionsList({ date: 'last-7-days' });
+      assert.equal(stub.calls[0].params.type, 'actions-list');
+      assert.equal(stub.calls[0].params.date, 'last-7-days');
+      assert.equal('href' in stub.calls[0].params, false);
+      assert.equal('page' in stub.calls[0].params, false);
+    });
+
+    it('includes filter params when filterKey and filterValue are provided', async () => {
+      const { client, stub } = newClient();
+      await client.getActionsList({
+        filterKey: 'href',
+        filterValue: 'https://warp.dev',
+        date: 'last-7-days',
+      });
+      assert.equal(stub.calls[0].params.href, 'https://warp.dev');
+    });
+
+    it('includes page param when page > 1', async () => {
+      const { client, stub } = newClient();
+      await client.getActionsList({ date: 'last-7-days', page: 3 });
+      assert.equal(stub.calls[0].params.page, 3);
+    });
+
+    it('omits page param when page is 1', async () => {
+      const { client, stub } = newClient();
+      await client.getActionsList({ date: 'last-7-days', page: 1 });
+      assert.equal('page' in stub.calls[0].params, false);
+    });
+
+    it('clamps limit > 1000 down to 1000', async () => {
+      const { client, stub } = newClient();
+      await client.getActionsList({ date: 'last-7-days', limit: 5000 });
+      assert.equal(stub.calls[0].params.limit, 1000);
+    });
   });
 
   describe('getEntrances', () => {

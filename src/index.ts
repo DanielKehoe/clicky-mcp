@@ -24,6 +24,8 @@ import { getReferringDomainsTool, handleGetReferringDomains } from './tools/get-
 import { getDownloadsTool, handleGetDownloads } from './tools/get-downloads.js';
 import { getEntrancesTool, handleGetEntrances } from './tools/get-entrances.js';
 import { getOutboundLinksTool, handleGetOutboundLinks } from './tools/get-outbound-links.js';
+import { getSegmentationTool, handleGetSegmentation } from './tools/get-segmentation.js';
+import { getOutboundClickSourcesTool, handleGetOutboundClickSources } from './tools/get-outbound-click-sources.js';
 
 function loadRegistry(): SiteRegistry {
   // Only load .env if neither env style is already populated. Claude Desktop
@@ -72,6 +74,8 @@ const BASE_TOOLS: Tool[] = [
   getDownloadsTool,
   getEntrancesTool,
   getOutboundLinksTool,
+  getSegmentationTool,
+  getOutboundClickSourcesTool,
 ];
 
 function withSiteParam(tool: Tool, aliases: string[], defaultAlias: string): Tool {
@@ -170,6 +174,10 @@ class ClickyMCPServer {
             return await handleGetEntrances(handlerArgs as any, client);
           case 'get_outbound_links':
             return await handleGetOutboundLinks(handlerArgs as any, client);
+          case 'get_segmentation':
+            return await handleGetSegmentation(handlerArgs as any, client);
+          case 'get_outbound_click_sources':
+            return await handleGetOutboundClickSources(handlerArgs as any, client);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
