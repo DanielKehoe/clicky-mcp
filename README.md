@@ -128,6 +128,10 @@ Total pageviews/actions for a period.
 Bounce rate and average time-on-site for a period.
 - `start_date` / `end_date` **or** `date_range`
 
+### get_new_vs_returning
+New vs returning visitors for a period: visits, unique visitors, new (first-time) visitors, and returning visits (visits minus new) with their shares. Returning is detected by cookie, so it is a lower bound where browsers expire cookies early.
+- `start_date` / `end_date` **or** `date_range`
+
 ### get_visitors_online
 Real-time visitor count and segmentation. Takes no parameters.
 

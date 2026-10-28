@@ -18,6 +18,7 @@ import { getPageTrafficTool, handleGetPageTraffic } from './tools/get-page-traff
 import { getVisitorsOnlineTool, handleGetVisitorsOnline } from './tools/get-visitors-online.js';
 import { getActionsTool, handleGetActions } from './tools/get-actions.js';
 import { getBounceRateTool, handleGetBounceRate } from './tools/get-bounce-rate.js';
+import { getNewVsReturningTool, handleGetNewVsReturning } from './tools/get-new-vs-returning.js';
 import { getCountriesTool, handleGetCountries } from './tools/get-countries.js';
 import { getSearchesTool, handleGetSearches } from './tools/get-searches.js';
 import { getReferringDomainsTool, handleGetReferringDomains } from './tools/get-referring-domains.js';
@@ -68,6 +69,7 @@ const BASE_TOOLS: Tool[] = [
   getVisitorsOnlineTool,
   getActionsTool,
   getBounceRateTool,
+  getNewVsReturningTool,
   getCountriesTool,
   getSearchesTool,
   getReferringDomainsTool,
@@ -162,6 +164,8 @@ class ClickyMCPServer {
             return await handleGetActions(handlerArgs as any, client);
           case 'get_bounce_rate':
             return await handleGetBounceRate(handlerArgs as any, client);
+          case 'get_new_vs_returning':
+            return await handleGetNewVsReturning(handlerArgs as any, client);
           case 'get_countries':
             return await handleGetCountries(handlerArgs as any, client);
           case 'get_searches':

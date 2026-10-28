@@ -152,6 +152,17 @@ export class ClickyClient {
     return response.data;
   }
 
+  async getNewVsReturning(date: string): Promise<unknown> {
+    const response = await this.client.get('', {
+      params: {
+        ...this.baseParams(),
+        type: 'visitors,visitors-unique,visitors-new',
+        date,
+      },
+    });
+    return response.data;
+  }
+
   async getCountries(date: string, limit?: number): Promise<unknown> {
     const params: Record<string, unknown> = {
       ...this.baseParams(),

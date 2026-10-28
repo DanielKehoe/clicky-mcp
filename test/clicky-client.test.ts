@@ -132,6 +132,15 @@ describe('ClickyClient', () => {
     });
   });
 
+  describe('getNewVsReturning', () => {
+    it('sends the comma-separated visitors,visitors-unique,visitors-new type', async () => {
+      const { client, stub } = newClient();
+      await client.getNewVsReturning('last-month');
+      assert.equal(stub.calls[0].params.type, 'visitors,visitors-unique,visitors-new');
+      assert.equal(stub.calls[0].params.date, 'last-month');
+    });
+  });
+
   describe('list-shaped tools (table-driven)', () => {
     const cases: Array<{
       name: string;
